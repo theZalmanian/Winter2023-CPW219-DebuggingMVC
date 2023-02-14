@@ -18,6 +18,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
             return View(await _context.Product.ToListAsync());
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
@@ -26,11 +27,17 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Product product)
         {
+            // If all data is valid
             if (ModelState.IsValid)
             {
-                await _context.AddAsync(product);
-                return RedirectToAction(nameof(Index));
+                // Prepare INSERT Statement
+                _context.Product.AddAsync(product);
+
+                // Execute query asynchronously
+                await _context.SaveChangesAsync();
             }
+            
+            // If all Product data not valid
             return View(product);
         }
 
