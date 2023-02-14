@@ -61,13 +61,23 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Product product)
         {
+            // If all data is valid
             if (ModelState.IsValid)
             {
-                _context.Update(product);
+                // Prepare UPDATE Statement
+                _context.Product.Update(product);
+
+                // Execute query asynchronously
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction(nameof(Index));
+                // Prepare success message
+                TempData["Message"] = $"{product.Name} was updated successfully";
+
+                // Send them back to the Product catalog
+                return RedirectToAction("Index");
             }
+
+            // If all Product data not valid
             return View(product);
         }
 
