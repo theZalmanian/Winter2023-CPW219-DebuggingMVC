@@ -13,6 +13,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
             _context = context;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Product.ToListAsync());
@@ -70,25 +71,50 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
             return View(product);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _context.Product
-                .FirstOrDefaultAsync(m => m.ProductId == id);
+            // Get the specified Product from the DB using it's ID
+            Product? currProduct = await _context.Product.FindAsync(id);
 
-            if (product == null)
+            // If the specified product is null
+            if (currProduct == null)
             {
+                // Display 404 error
                 return NotFound();
             }
 
-            return View(product);
+            // Otherwise display Product information
+            return View(currProduct);
         }
 
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            _context.Product.Remove(product);
-            return RedirectToAction(nameof(Index));
+            // Get the specified Product from the DB using it's ID
+            Product? currProduct = await _context.Product.FindAsync(id);
+
+            // If the specified product is not null
+            if (currProduct != null)
+            {
+                // Prepare DELETE Statement
+                _context.Product.Remove(currProduct);
+
+                // Execute query asynchronously
+                await _context.SaveChangesAsync();
+
+                // Prepare success message
+                TempData["Message"] = $"{currProduct.Name} was deleted successfully";
+
+                // Send them back to the Product catalog
+                return RedirectToAction("Index");
+            }
+
+            // Otherwise, prepare error message
+            TempData["Message"] = "This product has already been deleted";
+
+            // Send them back to the Product catalog
+            return RedirectToAction("Index");
         }
 
         private bool ProductExists(int id)
