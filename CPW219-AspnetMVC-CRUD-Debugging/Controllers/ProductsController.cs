@@ -35,6 +35,12 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 
                 // Execute query asynchronously
                 await _context.SaveChangesAsync();
+
+                // Prepare success message
+                TempData["Message"] = $"{product.Name} was created successfully";
+
+                // Send them back to the Product catalog
+                return RedirectToAction("Index");
             }
             
             // If all Product data not valid
